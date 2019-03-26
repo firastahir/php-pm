@@ -18,19 +18,11 @@ checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleC
        }
             steps {
                 script {
-                    if (env.GIT_BRANCH == 'master') {
+                   
                         withSonarQubeEnv ('sonar') {
                             sh "${scannerHome}/bin/sonar-scanner"
                         }
-                    } else if (env.GIT_BRANCH == 'development') {
-                        withSonarQubeEnv ('sonar') {
-                            sh "${scannerHome}/bin/sonar-scanner"
-                        }
-                    } else {
-                        withSonarQubeEnv ('sonar') {
-                            sh "${scannerHome}/bin/sonar-scanner"
-                        }
-                    }
+                    
                 }
             }
         }
