@@ -1,0 +1,65 @@
+pipeline {
+    agent any
+    
+    options {
+        skipDefaultCheckout true
+    }
+  
+    stages {
+        stage ('Checkout') {
+            steps {
+checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/firastahir/php-pm.git']]])            }
+        }
+       
+        
+        stage ('SonarQube') {
+            environment {
+        scannerHome = tool 'sonar'
+       }
+            steps {
+                script {
+                    if (env.GIT_BRANCH == 'master') {
+                        withSonarQubeEnv ('sonar') {
+                            sh "${scannerHome}/bin/sonar-scanner"
+                        }
+                    } else if (env.GIT_BRANCH == 'development') {
+                        withSonarQubeEnv ('sonar') {
+                            sh "${scannerHome}/bin/sonar-scanner"
+                        }
+                    } else {
+                        withSonarQubeEnv ('sonar') {
+                            sh "${scannerHome}/bin/sonar-scanner"
+                        }
+                    }
+                }
+            }
+        }
+    }
+ 
+}
+
+Another JF pipeline for SQ stage:
+
+node {
+
+  stage('SCM') {
+
+    git 'https://github.com/firastahir/php-pm.git'
+
+  }
+
+  stage('SonarQube analysis') {
+
+    // requires SonarQube Scanner 2.8+
+
+    def scannerHome = tool 'sonar-scanner';
+
+    withSonarQubeEnv('sonar-server') {
+
+      sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=my-project -Dsonar.sources=src -Dsonar.projectVersion=1.0.${BUILD_NUMBER}"
+
+    }
+
+  }
+
+}
